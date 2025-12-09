@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsroom</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-newspaper">
+                    <div class="newspaper-fold"></div>
+                    <div class="newspaper-header">NewsRM</div>
+                    <div class="newspaper-line"></div>
+                    <div class="newspaper-line short"></div>
+                    <div class="newspaper-line"></div>
+                </div>
+                <div class="brand-text">
+                    <h1>NewsRM</h1>
+                    <p class="slogan">a quicker editor</p>
+                </div>
+            </div>
+
+            <div class="control-group" style="margin-bottom: 20px; padding: 0 12px;">
+                <label for="article-type"
+                    style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 8px; font-weight: 500;">ARTICLE
+                    TYPE</label>
+                <select id="article-type" class="select-input">
+                    <option value="hard-news">Hard News</option>
+                    <option value="feature">Feature</option>
+                    <option value="op-ed">Op-Ed</option>
+                    <option value="soft-news">Soft News</option>
+                </select>
+            </div>
+
+            <button id="btn-new-article" class="btn-secondary" style="margin: 0 12px 20px 12px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Edit Another Piece
+            </button>
+
+            <div class="sidebar-section-title">Saved Articles</div>
+            <div id="saved-list" class="saved-list">
+                <div style="padding: 12px; font-size: 12px; opacity: 0.6; text-align: center;">No saved articles yet
+                </div>
+            </div>
+
+            <div style="flex:1;"></div> <!-- Spacer to push status down -->
+
+            <div class="status-indicator">
+                <span class="dot"></span>
+                <span>Ready</span>
+            </div>
+        </aside>
+
+        <!-- Main Editor Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="article-meta">
+                    <textarea id="article-headline" placeholder="Headline..." class="headline-input"
+                        rows="1"></textarea>
+                    <div class="meta-info">
+                        <span id="word-count">0 words</span>
+                        <span class="separator">•</span>
+                        <span id="read-time">0 min read</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="btn-analyze" class="btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Analyze Article
+                    </button>
+                </div>
+            </header>
+
+            <div class="editor-container">
+                <div id="editor" class="editor" contenteditable="true" placeholder="Start writing your story..."></div>
+            </div>
+        </main>
+
+        <!-- Analysis Panel (Hidden by default) -->
+        <aside id="analysis-panel" class="analysis-panel">
+            <div class="panel-header">
+                <h2>Analysis</h2>
+                <button id="btn-close-panel" class="btn-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="panel-content">
+                <!-- Score Card -->
+                <div class="card score-card">
+                    <h3>Impact Score</h3>
+                    <div class="score-display">
+                        <span id="impact-score">--</span>
+                        <span class="score-label">/ 100</span>
+                    </div>
+                    <div id="score-details" class="score-details"
+                        style="display:none; margin-top: 15px; border-top: 1px solid #e5e5ea; padding-top: 15px;">
+                        <p id="score-meaning" style="font-size: 14px; font-weight: 500; margin-bottom: 8px;"></p>
+                        <p style="font-size: 13px; color: #8e8e93; margin-bottom: 8px;">Target Range: <span
+                                id="score-target" style="color: #1c1c1e;"></span></p>
+                        <div style="font-size: 13px;">
+                            <strong>Improvement:</strong>
+                            <ul id="score-tips" style="padding-left: 20px; margin-top: 4px; color: #48484a;"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radar Chart -->
+                <div class="card chart-card">
+                    <h3>Journalistic Elements <small
+                            style="font-size: 10px; color: var(--accent-color); cursor: pointer;"
+                            onclick="alert('Click on points in the chart to define them!')">(Click for
+                            definitions)</small></h3>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="strengths">Strengths & Weaknesses</button>
+                    <button class="tab-btn" data-tab="titles">Titles & Lede</button>
+                    <button class="tab-btn" data-tab="ap">AP Style</button>
+                    <button class="tab-btn" data-tab="audience">Audience</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-strengths" class="tab-pane active">
+                    <div id="strengths-list" class="list-group"></div>
+                </div>
+
+                <div id="tab-titles" class="tab-pane">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Title Options</h4>
+                        <button id="btn-reload-titles" class="btn-icon-small" title="Generate new titles">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="titles-list" class="list-group"></div>
+                    <div id="lede-tips" class="info-block" style="margin-top: 20px;"></div>
+                </div>
+
+                <div id="tab-ap" class="tab-pane">
+                    <div id="ap-list" class="list-group"></div>
+                </div>
+
+                <div id="tab-audience" class="tab-pane">
+                    <div id="audience-info" class="info-block"></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Co-Creation Modal -->
+    <div id="modal-backdrop" class="modal-backdrop" style="display: none;">
+        <div class="modal">
+            <h2 id="modal-title">Suggestion</h2>
+            <div id="modal-content"></div>
+            <div class="modal-actions">
+                <button id="modal-close" class="btn-primary">Got it</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="logo-newspaper spinning">
+                <div class="newspaper-fold"></div>
+                <div class="newspaper-header">NewsRM</div>
+                <div class="newspaper-line"></div>
+                <div class="newspaper-line short"></div>
+                <div class="newspaper-line"></div>
+            </div>
+            <p class="loading-text">Analyzing your article...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/mockService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
